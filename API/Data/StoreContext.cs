@@ -5,12 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
-public class StoreContext : IdentityDbContext<User>
+public class StoreContext(DbContextOptions options) : IdentityDbContext<User>(options)
 {
-    public StoreContext(DbContextOptions options) : base(options)
-    {
-    }
-
     public DbSet<Product> Products { get; set; }
     public DbSet<Basket> Baskets { get; set; }
 
@@ -20,8 +16,8 @@ public class StoreContext : IdentityDbContext<User>
 
         builder.Entity<IdentityRole>()
             .HasData(
-                new IdentityRole {Name = "Member", NormalizedName = "MEMBER"},
-                new IdentityRole {Name = "Admin", NormalizedName = "ADMIN"}
+                new IdentityRole { Name = "Member", NormalizedName = "MEMBER" },
+                new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" }
             );
     }
 }
