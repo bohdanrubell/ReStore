@@ -1,13 +1,16 @@
-﻿using API.DTOs;
+﻿using API.Data;
+using API.DTOs;
 using API.Entities;
+using API.Extensions;
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-public class AccountController(UserManager<User> userManager, TokenService tokenService) : BaseApiController
+public class AccountController(UserManager<User> userManager, TokenService tokenService, StoreContext context) : BaseApiController
 {
     [HttpPost("login")]
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
@@ -16,12 +19,38 @@ public class AccountController(UserManager<User> userManager, TokenService token
         if (user is null || !await userManager.CheckPasswordAsync(user, loginDto.Password))
             return Unauthorized();
 
+        var userBasket = await RetrieveBasket(loginDto.Username);
+        var anonBasket = await RetrieveBasket(Request.Cookies["buyerId"]);
+
+        if (anonBasket is not null)
+        {
+            if (userBasket != null) context.Baskets.Remove(userBasket);
+            anonBasket.BuyerId = user.UserName;
+            Response.Cookies.Delete("buyerId");
+            await context.SaveChangesAsync();
+        }
+        
         return new UserDto
         {
             Email = user.Email,
-            Token = await tokenService.GenerateToken(user)
+            Token = await tokenService.GenerateToken(user),
+            Basket = anonBasket is not null ? anonBasket.MapBasketToDto() : userBasket.MapBasketToDto()
         };
 
+    }
+    
+    private async Task<Basket> RetrieveBasket(string buyerId)
+    {
+        if (string.IsNullOrEmpty(buyerId))
+        {
+            Response.Cookies.Delete("buyerId");
+            return null;
+        }
+        
+        return await context.Baskets
+            .Include(i => i.Items)
+            .ThenInclude(p => p.Product)
+            .FirstOrDefaultAsync(basket => basket.BuyerId == buyerId);
     }
     
     [HttpPost("register")]
