@@ -34,7 +34,7 @@ public class AccountController(UserManager<User> userManager, TokenService token
         {
             Email = user.Email,
             Token = await tokenService.GenerateToken(user),
-            Basket = anonBasket is not null ? anonBasket.MapBasketToDto() : userBasket.MapBasketToDto()
+            Basket = anonBasket is not null ? anonBasket.MapBasketToDto() : userBasket?.MapBasketToDto()
         };
 
     }
@@ -52,7 +52,8 @@ public class AccountController(UserManager<User> userManager, TokenService token
             .ThenInclude(p => p.Product)
             .FirstOrDefaultAsync(basket => basket.BuyerId == buyerId);
     }
-    
+
+
     [HttpPost("register")]
     public async Task<ActionResult> Register(RegisterDto registerDto)
     {
@@ -80,10 +81,13 @@ public class AccountController(UserManager<User> userManager, TokenService token
     public async Task<ActionResult<UserDto>> GetCurrentUser()
     {
         var user = await userManager.FindByNameAsync(User.Identity.Name);
+
+        var userBasket = await RetrieveBasket(User.Identity.Name);
         return new UserDto
         {
             Email = user.Email,
-            Token = await tokenService.GenerateToken(user)
+            Token = await tokenService.GenerateToken(user),
+            Basket = userBasket?.MapBasketToDto()
         };
     }
 }

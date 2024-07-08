@@ -67,7 +67,6 @@ public class BasketController : BaseApiController
             Response.Cookies.Delete("buyerId");
             return null;
         }
-        
         return await _context.Baskets
             .Include(i => i.Items)
             .ThenInclude(p => p.Product)
