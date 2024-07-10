@@ -90,4 +90,14 @@ public class AccountController(UserManager<User> userManager, TokenService token
             Basket = userBasket?.MapBasketToDto()
         };
     }
+
+    [Authorize]
+    [HttpGet("savedAddress")]
+    public async Task<ActionResult<UserAddress>> GetSavedAddress()
+    {
+        return await userManager.Users
+            .Where(x => x.UserName == User.Identity.Name)
+            .Select(user => user.Address)
+            .FirstOrDefaultAsync();
+    }
 }
