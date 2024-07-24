@@ -27,7 +27,7 @@ function App() {
   }, [initApp])
   
   const [darkMode, setDarkMode] = useState(false);
-  const palleteType = darkMode ? 'dark' : 'light';
+  const palleteType = !darkMode ? 'dark' : 'light';
   const theme = createTheme({
     palette: {
       mode: palleteType,

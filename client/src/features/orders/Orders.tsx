@@ -10,8 +10,6 @@ import OrderDetail from "./OrderDetail.tsx";
 export default function Orders() {
     const [orders, setOrders] = useState<Order[] | null>(null);
     const [loading, setLoading] = useState(true);
-    // const [hide, setHide] = useState(true);
-    // const [choseOrder, setChoseOrder] = useState<Order>();
     const [selectedOrder, setSelectedOrderNumber] = useState(0);
 
     useEffect(() => {
