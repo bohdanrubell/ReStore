@@ -1,5 +1,4 @@
-﻿using API.Data.Migrations;
-using API.Entities;
+﻿using API.Entities;
 using Stripe;
 namespace API.Services;
 
