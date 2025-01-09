@@ -29,17 +29,7 @@ public class ProductsController(StoreContext context, IMapper mapper, ImageServi
 
         return products;
     }
-
-    [HttpGet("{id}", Name = "GetProduct")]
-    public async Task<ActionResult<Product>> GetProduct(int id)
-    {
-        var product = await context.Products.FindAsync(id);
-
-        if (product == null) return NotFound();
-
-        return product;
-    }
-
+    
     [HttpGet("filters")]
     public async Task<IActionResult> GetFilters()
     {
@@ -49,7 +39,7 @@ public class ProductsController(StoreContext context, IMapper mapper, ImageServi
         return Ok(new { brands, types });
     }
 
-    [Authorize(Roles = "Admin")]
+    /*[Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<Product>> CreateProduct([FromForm]CreateProductDto productDto)
     {
@@ -73,7 +63,8 @@ public class ProductsController(StoreContext context, IMapper mapper, ImageServi
         if (result) return CreatedAtRoute("GetProduct", new { Id = product.Id }, product);
 
         return BadRequest(new ProblemDetails { Title = "Problem creating a new product" });
-    }
+    }*/
+    //TODO: relocate to create product slice
 
     [Authorize(Roles = "Admin")]
     [HttpPut]
@@ -104,6 +95,7 @@ public class ProductsController(StoreContext context, IMapper mapper, ImageServi
 
         return BadRequest(new ProblemDetails { Title = "The problem was occured by update product" });
     }
+  
 
     [Authorize(Roles = "Admin")]
     [HttpDelete]
