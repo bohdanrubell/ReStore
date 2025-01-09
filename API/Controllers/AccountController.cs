@@ -3,6 +3,7 @@ using API.DTOs;
 using API.Entities;
 using API.Extensions;
 using API.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +14,23 @@ namespace API.Controllers;
 public class AccountController(UserManager<User> userManager, TokenService tokenService, StoreContext context) : BaseApiController
 {
     [HttpPost("login")]
-    public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
+    public async Task<ActionResult<UserDto>> Login(LoginDto loginDto, IValidator<LoginDto> validator)
     {
+        var validatorResult = validator.ValidateAsync(loginDto);
+
+        if (!validatorResult.Result.IsValid)
+        {
+            var problemDetails = new HttpValidationProblemDetails(validatorResult.Result.ToDictionary())
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Validation failed",
+                Detail = "One or more validation errors occurred.",
+                Instance = "/api/login"
+            };
+            
+            return BadRequest(problemDetails);
+        }
+        
         var user = await userManager.FindByNameAsync(loginDto.Username);
         if (user is null || !await userManager.CheckPasswordAsync(user, loginDto.Password))
             return Unauthorized();
