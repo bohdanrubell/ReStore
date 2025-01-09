@@ -1,3 +1,6 @@
 API/bin/
 API/obj/
 API/appsettings.json
+.idea/
+.vs/
+.vscode/
