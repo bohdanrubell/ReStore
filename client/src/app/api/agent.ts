@@ -79,23 +79,15 @@ function createFormData(item: any) {
 }
 
 const Admin = {
-    createProduct: (product: any) => requests.postForm('products', createFormData(product)),
+    createProduct: (product: any) => requests.postForm('products/create', createFormData(product)),
     updateProduct: (product: any) => requests.putForm('products', createFormData(product)),
-    deleteProduct: (id: number) => requests.delete(`products/${id}`)
+    deleteProduct: (id: number) => requests.delete(`products/delete/${id}`)
 }
 
 const Catalog = {
     list: (params: URLSearchParams) => requests.get('products', params),
     details: (id: number) => requests.get(`products/${id}`),
     fetchFilters: () => requests.get('products/filters')
-}
-
-const TestErrors = {
-    get400Error: () => requests.get('buggy/bad-request'),
-    get401Error: () => requests.get('buggy/unauthorised'),
-    get404Error: () => requests.get('buggy/not-found'),
-    get500Error: () => requests.get('buggy/server-error'),
-    getValidationError: () => requests.get('buggy/validation-error')
 }
 
 const Basket = {
@@ -124,7 +116,6 @@ const Payments = {
 
 const agent = {
     Catalog,
-    TestErrors,
     Basket,
     Account,
     Orders,
