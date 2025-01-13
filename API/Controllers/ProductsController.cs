@@ -95,26 +95,4 @@ public class ProductsController(StoreContext context, IMapper mapper, ImageServi
 
         return BadRequest(new ProblemDetails { Title = "The problem was occured by update product" });
     }
-  
-
-    [Authorize(Roles = "Admin")]
-    [HttpDelete]
-    public async Task<ActionResult> DeleteProduct(int id)
-    {
-        var product = await context.Products.FindAsync(id);
-        
-        if (product is null) return NotFound();
-        
-        if (!string.IsNullOrEmpty(product.PublicId)) 
-            await imageService.DeleteImageAsync(product.PublicId);
-        
-        context.Products.Remove(product);
-        
-        var result = await context.SaveChangesAsync() > 0;
-
-        if (result) return Ok();
-
-        return BadRequest(new ProblemDetails { Title = "The problem was occured by delete product" });
-    }
-    
 }
